@@ -10,6 +10,8 @@ from torch import nn
 
 from brevitas_examples.llm.llm_quant.export import brevitas_proxy_export_mode
 
+import shark_turbine.aot as aot
+
 
 class UnetExportWrapper(nn.Module):
 
@@ -35,8 +37,15 @@ def export_torch_export(pipe, trace_inputs, output_dir, export_manager):
     export_manager.change_weight_export(True)
     import brevitas.config as config
     config._FULL_STATE_DICT = True
+    print(trace_inputs)
     with torch.no_grad(), brevitas_proxy_export_mode(pipe.unet, export_manager):
         exported_program = torch.export.export(
             UnetExportWrapper(pipe.unet), args=(trace_inputs[0],), kwargs=trace_inputs[1])
     config._FULL_STATE_DICT = False
+
+    print("starting aot")
+    exported = aot.export(exported_program, args=(trace_inputs[0],), kwargs=trace_inputs[1])
+    print("done")
+    exported.save_mlir("unet.mlir")
+
     torch.export.save(exported_program, output_path)

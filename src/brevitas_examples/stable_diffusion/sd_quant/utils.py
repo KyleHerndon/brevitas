@@ -174,8 +174,8 @@ def generate_unet_xl_rand_inputs(
         embedding_shape, unet_input_shape, batch_size, device, dtype, with_return_dict_false)
     sample = unet_rand_inputs['sample']
     del unet_rand_inputs['sample']
-    unet_rand_inputs['timestep_cond'] = None
-    unet_rand_inputs['cross_attention_kwargs'] = None
+    #unet_rand_inputs['timestep_cond'] = None
+    #unet_rand_inputs['cross_attention_kwargs'] = None
     unet_rand_inputs['added_cond_kwargs'] = {
         "text_embeds": torch.randn(1, 1280, dtype=dtype, device=device),
         "time_ids": torch.randn(1, 6, dtype=dtype, device=device)}
